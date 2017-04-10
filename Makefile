@@ -20,8 +20,6 @@ lint:
 build: install test lint test
 
 .PHONY: run
-run:
-	export FLASK_APP=reconcile
-	export FLASK_DEBUG=true
-	flask run
+run: build
+	FLASK_APP=reconcile FLASK_DEBUG=true flask run
 
