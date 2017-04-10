@@ -40,14 +40,15 @@ class Event(object):
 class Queue(object):
 
     def __init__(self, name, fail_indexes=None):
-        fail_indexes = fail_indexes or []
+        if fail_indexes is None:
+            fail_indexes = []
 
+        self.fail_indexes = fail_indexes
         self.name = name
         self.subscribers = []
         self.received_messages = deque([])
         self.consumers = []
         self.rotation = 0
-        self.fail_indexes = fail_indexes
 
     def publish(self, event):
         for subscriber in self.subscribers:
@@ -120,10 +121,12 @@ class TestSubscriber(object):
 class TestWorker(object):
 
     def __init__(self, fail_indexes=None):
-        fail_indexes = fail_indexes or None
+        if fail_indexes is None:
+            fail_indexes = []
+
+        self.fail_indexes = fail_indexes
         self.messages = []
         self.counter = 0
-        self.fail_indexes = fail_indexes
 
     def consume(self, queue):
         queue.add_consumer(self)

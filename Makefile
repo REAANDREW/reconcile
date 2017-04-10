@@ -1,7 +1,7 @@
 
 .PHONY: install
 install:
-	pip install --user -r requirements.txt
+	pip install --user -e .
 
 .PHONY: format
 format:
@@ -17,4 +17,11 @@ lint:
 	pylint --rcfile pylint.rc --disable=missing-docstring --msg-template='{msg_id}:{path}:{symbol}:{line:3d},{column}: {obj}: {msg}' **/*.py
 
 .PHONY: build
-build: install format test lint test
+build: install test lint test
+
+.PHONY: run
+run:
+	export FLASK_APP=reconcile
+	export FLASK_DEBUG=true
+	flask run
+

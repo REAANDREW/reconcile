@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from setuptools import setup, find_packages
+from setuptools import setup
+from pip.req import parse_requirements
+install_reqs = parse_requirements('./requirements.txt')
+reqs = [str(ir.req) for ir in install_reqs]
 
 
 with open('README.md') as f:
-    readme = f.read()
+  readme = f.read()
 
 with open('LICENSE') as f:
-    license = f.read()
+  license = f.read()
 
 setup(
     name='reconcile',
@@ -18,6 +21,7 @@ setup(
     author_email='code@andrewrea.co.uk',
     url='https://github.com/reaandrew/reconcile',
     license=license,
-    packages=find_packages(exclude=('tests'))
+    packages=['reconcile'],
+    install_requires=reqs,
+    include_package_data=True
 )
-
