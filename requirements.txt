@@ -1,0 +1,5 @@
+autoflake
+autopep8
+flask
+pylint
+coverage

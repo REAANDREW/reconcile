@@ -1,19 +1,22 @@
 import unittest
 from collections import deque
 
+
 class CallException(Exception):
 
     def __init__(self, message):
         # Call the base class constructor with the parameters it needs
         super(CallException, self).__init__(message)
 
-class Events:
-    MSG_RECEIVED = "Message Received"
-    MSG_PROXIED = "Message Proxied"
-    MSG_DELIVERED = "Message Delivered"
-    MSG_DELIVERY_FAILED = "Message Delivery Failed"
 
-class Message:
+class Events(object):
+    msg_received = "Message Received"
+    msg_proxied = "Message Proxied"
+    msg_delivered = "Message Delivered"
+    msg_delivery_failed = "Message Delivery Failed"
+
+
+class Message(object):
 
     def __init__(self, content):
         self.content = content
@@ -22,7 +25,8 @@ class Message:
     def increment_fail_count(self):
         self.failures = self.failures + 1
 
-class Event:
+
+class Event(object):
 
     def __init__(self, source, name, data):
         self.source = source
@@ -32,9 +36,12 @@ class Event:
     def __repr__(self):
         return self.name
 
-class Queue:
-    
-    def __init__(self, name, fail_indexes=[]):
+
+class Queue(object):
+
+    def __init__(self, name, fail_indexes=None):
+        fail_indexes = fail_indexes or []
+
         self.name = name
         self.subscribers = []
         self.received_messages = deque([])
@@ -59,10 +66,10 @@ class Queue:
 
     def send(self, msg):
         self.rotation = self.rotation + 1
-        if (self.rotation-1) in self.fail_indexes:
+        if self.rotation - 1 in self.fail_indexes:
             raise CallException('DOWN')
         self.received_messages.append(msg)
-        self.publish(Event(self, Events.MSG_RECEIVED, {"msg": msg}))
+        self.publish(Event(self, Events.msg_received, {"msg": msg}))
 
     def dequeue(self):
         if len(self.consumers) > 0 and len(self.received_messages) > 0:
@@ -70,27 +77,32 @@ class Queue:
             msg = self.received_messages.popleft()
             try:
                 consumer.process(msg)
-                self.publish(Event(self, Events.MSG_DELIVERED, {"msg": msg}))
+                self.publish(Event(self, Events.msg_delivered, {"msg": msg}))
             except CallException:
                 msg.increment_fail_count()
                 self.received_messages.append(msg)
-                self.publish(Event(self, Events.MSG_DELIVERY_FAILED, {"msg": msg}))
-                 
+                self.publish(
+                    Event(
+                        self, Events.msg_delivery_failed, {
+                            "msg": msg}))
+
     def fail_on_rotation(self, index):
-        return Queue(self.name, fail_indexes=self.fail_indexes+[index])
+        return Queue(self.name, fail_indexes=self.fail_indexes + [index])
 
     def continue_failing_for(self, rotations):
-        lastIndex = self.fail_indexes[-1]
-        queueToReturn = self
-        for index in range(lastIndex , lastIndex + rotations):
-            queueToReturn = Queue(self.name, fail_indexes=queueToReturn.fail_indexes+[index+1])
+        last_index = self.fail_indexes[-1]
+        queue_to_return = self
+        for index in range(last_index, last_index + rotations):
+            queue_to_return = Queue(
+                self.name, fail_indexes=queue_to_return.fail_indexes + [index + 1])
 
-        return queueToReturn
+        return queue_to_return
 
     def crank_handle(self):
         self.dequeue()
 
-class TestSubscriber:
+
+class TestSubscriber(object):
 
     def __init__(self):
         self.events = []
@@ -104,9 +116,11 @@ class TestSubscriber:
     def subscribe_to(self, publisher):
         publisher.add_subscriber(self)
 
-class TestWorker:
 
-    def __init__(self, fail_indexes=[]):
+class TestWorker(object):
+
+    def __init__(self, fail_indexes=None):
+        fail_indexes = fail_indexes or None
         self.messages = []
         self.counter = 0
         self.fail_indexes = fail_indexes
@@ -116,12 +130,13 @@ class TestWorker:
 
     def process(self, message):
         self.counter = self.counter + 1
-        if (self.counter - 1) in self.fail_indexes:
+        if self.counter - 1 in self.fail_indexes:
             raise CallException("FAIL")
         self.messages.append(message)
 
     def fail_on_message_index(self, index):
-        return TestWorker(fail_indexes=self.fail_indexes+[index])
+        return TestWorker(fail_indexes=self.fail_indexes + [index])
+
 
 class TestTestWorker(unittest.TestCase):
 
@@ -129,26 +144,26 @@ class TestTestWorker(unittest.TestCase):
         worker = TestWorker().fail_on_message_index(1)
 
         worker.process(Message("something"))
-        with self.assertRaises(CallException): 
+        with self.assertRaises(CallException):
             worker.process(Message("something"))
 
 
 class TestQueue(unittest.TestCase):
 
-    def test_queue_publishes_MSG_RECEIVED(self):
-        #arrange
+    def test_queue_publishes_msg_received(self):
+        # arrange
         subscriber = TestSubscriber()
         queue = Queue("Q1")
         subscriber.subscribe_to(queue)
-        
-        #act
-        queue.send(Message("something"))
-        
-        #assert
-        self.assertEquals(len(subscriber.events), 1)
-        self.assertEquals(subscriber.events[0].name,Events.MSG_RECEIVED)
 
-    def test_queue_publishes_MSG_DELIVERED(self):
+        # act
+        queue.send(Message("something"))
+
+        # assert
+        self.assertEquals(len(subscriber.events), 1)
+        self.assertEquals(subscriber.events[0].name, Events.msg_received)
+
+    def test_queue_publishes_msg_delivered(self):
         queue = Queue("Q1")
         queue.send(Message("something"))
 
@@ -160,7 +175,7 @@ class TestQueue(unittest.TestCase):
         queue.crank_handle()
 
         self.assertEquals(len(subscriber.events), 1)
-        self.assertEquals(subscriber.events[0].name,Events.MSG_DELIVERED)
+        self.assertEquals(subscriber.events[0].name, Events.msg_delivered)
 
     def test_queue_retries_on_consumer_failure(self):
         queue = Queue("Q1")
@@ -174,11 +189,11 @@ class TestQueue(unittest.TestCase):
         queue.crank_handle()
         queue.crank_handle()
 
-        print(subscriber.events)
-        
         self.assertEquals(len(subscriber.events), 2)
-        self.assertEquals(subscriber.events[0].name,Events.MSG_DELIVERY_FAILED)
-        self.assertEquals(subscriber.events[1].name,Events.MSG_DELIVERED)
+        self.assertEquals(
+            subscriber.events[0].name,
+            Events.msg_delivery_failed)
+        self.assertEquals(subscriber.events[1].name, Events.msg_delivered)
         self.assertEquals(subscriber.events[1].data["msg"].failures, 1)
 
     def test_queue_fail_on_rotation(self):
@@ -186,7 +201,7 @@ class TestQueue(unittest.TestCase):
         queue.send(Message("something"))
         queue.send(Message("something"))
 
-        with self.assertRaises(CallException): 
+        with self.assertRaises(CallException):
             queue.send(Message("something"))
 
         queue.send(Message("something"))
@@ -197,13 +212,11 @@ class TestQueue(unittest.TestCase):
         queue.send(Message("something"))
         queue.send(Message("something"))
 
-        with self.assertRaises(CallException): 
+        with self.assertRaises(CallException):
             queue.send(Message("something"))
-        with self.assertRaises(CallException): 
+        with self.assertRaises(CallException):
             queue.send(Message("something"))
-        with self.assertRaises(CallException): 
+        with self.assertRaises(CallException):
             queue.send(Message("something"))
 
         queue.send(Message("something"))
-
-
