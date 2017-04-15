@@ -1,4 +1,4 @@
 # Reconcile
 
-A distributed systems simulator
+Skeleton Python Application
 
