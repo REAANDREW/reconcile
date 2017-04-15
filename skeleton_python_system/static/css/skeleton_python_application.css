@@ -1,0 +1,12 @@
+
+html,body{
+  min-height:100%;
+}
+
+.container {
+  min-height:100%;
+}
+
+#view{
+  min-height:100%;
+}

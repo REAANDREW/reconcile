@@ -1,7 +1,7 @@
 import os
 import unittest
 import tempfile
-from reconcile import app
+from skeleton_python_system import app
 
 
 class FlaskrTestCase(unittest.TestCase):
@@ -11,7 +11,7 @@ class FlaskrTestCase(unittest.TestCase):
 
   def test_root(self):
     rv = self.app.get('/')
-    assert b'Reconcile' in rv.data
+    assert b'Skeleton' in rv.data
 
 
 if __name__ == '__main__':
