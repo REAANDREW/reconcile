@@ -1,4 +1,4 @@
 # Reconcile
 
-Skeleton Python Application
+Skeleton Python System
 
