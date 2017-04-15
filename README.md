@@ -1,4 +1,4 @@
-# Reconcile
+# Skeleton Python System
 
-A distributed systems simulator
+Skeleton Python System
 
