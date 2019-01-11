@@ -1,7 +1,7 @@
 import urllib2
 from flask import Flask
 from flask_testing import LiveServerTestCase
-from skeleton_pyton_system import app
+from skeleton_python_system import app
 
 # Testing with LiveServer
 

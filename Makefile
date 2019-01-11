@@ -1,7 +1,7 @@
 
 .PHONY: install
 install:
-	pip install --user -e .
+	pip install -e .
 
 .PHONY: format
 format:
@@ -10,7 +10,7 @@ format:
 
 .PHONY: test
 test:
-	nosetests --all-modules --traverse-namespace --with-coverage --cover-min-percentage=95 --cover-package=reconcile --cover-inclusive --cover-html
+	pytest --cov-report html --cov-report xml --cov-report annotate  --cov=skeleton_python_system --html testreport.html --self-contained-html test/*
 
 .PHONY: lint
 lint:

@@ -4,3 +4,6 @@ flask
 flask_testing
 pylint
 coverage
+pytest
+pytest-cov
+pytest-html
