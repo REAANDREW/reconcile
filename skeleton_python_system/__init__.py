@@ -1,4 +1,5 @@
 from flask import Flask
-app = Flask(__name__, static_url_path='/static')
 
-import skeleton_python_system.views
+def create_app():
+  app = Flask(__name__, static_url_path='/static', instance_relative_config=True)
+  return app

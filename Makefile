@@ -14,7 +14,7 @@ test:
 
 .PHONY: lint
 lint:
-	pylint --rcfile pylint.rc --disable=missing-docstring --msg-template='{msg_id}:{path}:{symbol}:{line:3d},{column}: {obj}: {msg}' **/*.py
+	pylint --rcfile pylintrc **/*.py
 
 .PHONY: build
 build: install test lint test
