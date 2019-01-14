@@ -1,0 +1,9 @@
+windows:
+  - name: sample-two-panes
+    root: ~/skeleton_python_system
+    layout: main-vertical
+    options:
+      main-pane-width: 110
+    panes:
+      - vim 
+      - ptw
