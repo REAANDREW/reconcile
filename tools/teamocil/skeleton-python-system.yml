@@ -1,9 +1,16 @@
 windows:
-  - name: sample-two-panes
-    root: ~/skeleton_python_system
-    layout: main-vertical
-    options:
-      main-pane-width: 110
+  - name: skeleton
+    root: ./
+    layout: d8ab,208x57,0,0{144x57,0,0,1,63x57,145,0[63x29,145,0,2,63x27,145,30,3]}    
+    focus: true
     panes:
-      - vim 
+      - commands:
+         - vim
+        focus: true
       - ptw
+      - echo hello
+  - name: skeleton-dev-server
+    root: ./
+    layout: even-horizontal
+    panes:
+      - echo something else
