@@ -7,3 +7,6 @@ windows:
     panes:
       - vim 
       - ptw
+   - name: opsview
+     panes:
+       - glances
