@@ -23,3 +23,6 @@ build: install test lint test
 run: build
 	FLASK_APP=reconcile FLASK_DEBUG=true flask run
 
+.PHONY: ide
+ide:
+	teamocil --layout ./tools/teamocil/skeleton-python-system.yml
